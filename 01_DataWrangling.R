@@ -1,3 +1,6 @@
+# November 09th, 2021
+# Subject: Data Wrangling
+
 #to install packages do in te console: install.packages('tidyverse')
 library(tidyverse)
 library(readxl)
@@ -83,7 +86,8 @@ View(dummy_profile)
 
 #Transmute: include variables and exclude others
 
-dataset_exclude <- dataset_start %>% transmute(Student, TimeToSchool, DistanceToSchool, new_var_1)
+dataset_exclude <- dataset_start %>% transmute(Student, TimeToSchool, DistanceToSchool, DrivingProfile,
+                                               new_var_1)
 View(dataset_exclude)
 
 #cut: classify the data
@@ -92,6 +96,29 @@ dataset_time <- dataset_exclude %>% mutate(time_rank = cut(TimeToSchool,
                                                          c(0, median(TimeToSchool), Inf), 
                                                          c('faster', 'slower')))
 View(dataset_time)
+
+#Slice: raw R
+select_1<- dataset_time[,c("Student", "time_rank")]
+print(select_1)
+
+select_2<- dataset_time[ 2:5 ,1:4]
+print(select_2)
+
+
+#Select: used to extract selected variabes or to reposition variables
+base_select_1<- dataset_time %>%select(Student, time_rank)
+print(base_select_1)
+
+base_select_2<- dataset_time %>%select(everything(), -DrivingProfile)
+print(base_select_2)
+
+base_select_3<- dataset_time %>%select(Student:DistanceToSchool)
+print(base_select_3)
+
+
+base_select_4<- dataset_time %>%select(starts_with("S")) #print variables that start with S
+print(base_select_4)
+
 
 #Example 2 -----------------------------------
 
@@ -136,6 +163,7 @@ covid_source <- covid_source %>%  mutate(relativeCases =
                                                  Inf),
                                                c('quartileFirst', 'quartileSecond', 'quartileThird', 'quartileFourth')
                                            ))
+#type = 5, you can do F1 to get assistance from help
 
 table(covid_source$relativeCases)
 
