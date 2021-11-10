@@ -94,7 +94,10 @@ View(dataset_exclude)
 
 dataset_time <- dataset_exclude %>% mutate(time_rank = cut(TimeToSchool, 
                                                          c(0, median(TimeToSchool), Inf), 
-                                                         c('faster', 'slower')))
+                                                         c('faster', 'slower')),
+                                           dist_rank = cut(DistanceToSchool, 
+                                                           c(0, median(DistanceToSchool), Inf), 
+                                                           c('near', 'far')))
 View(dataset_time)
 
 #Slice: raw R
@@ -103,7 +106,6 @@ print(select_1)
 
 select_2<- dataset_time[ 2:5 ,1:4]
 print(select_2)
-
 
 #Select: used to extract selected variabes or to reposition variables
 base_select_1<- dataset_time %>%select(Student, time_rank)
@@ -115,9 +117,21 @@ print(base_select_2)
 base_select_3<- dataset_time %>%select(Student:DistanceToSchool)
 print(base_select_3)
 
-
 base_select_4<- dataset_time %>%select(starts_with("S")) #print variables that start with S
 print(base_select_4)
+
+#How we can reposition variables:
+
+dataset_time %>% select(Student, time_rank, dist_rank, everything())
+
+# Or by relocating
+
+dataset_time %>% relocate(DistanceToSchool, .after = dist_rank) %>% 
+                          relocate(TimeToSchool, .after = time_rank)
+
+# Pull: similar to select but return an array:
+array_pull <- dataset_time %>% pull(var = 1)
+array_pull
 
 
 #Example 2 -----------------------------------
@@ -167,4 +181,24 @@ covid_source <- covid_source %>%  mutate(relativeCases =
 
 table(covid_source$relativeCases)
 
+
+#manipulate the data to exclude deathsDay and add groups to the beginning to the dataset
+covid_source <- covid_source %>% select(country, region, relativeCases, everything(),-deathsLastDay)
+View(covid_source)
+
+#EXAMPLE 3 ================
+
+
+championsLeague <- read.csv('E:/DataScienceMBA/RStudio/DataScienceMBA/02_DataWrangling/(5.2) Champions League 2020-2021.csv',
+                         header = TRUE,
+                         sep = ',',
+                         dec = '.')
+championsLeague <- championsLeague %>% 
+  mutate(winner = case_when(
+    c(championsLeague$team_home_score - championsLeague$team_away_score) == 0 ~'tie',
+    c(championsLeague$team_home_score - championsLeague$team_away_score) > 0 ~'house',
+    c(championsLeague$team_home_score - championsLeague$team_away_score) < 0 ~'visitor')) %>% 
+  relocate(winner, .after = team_away_score)
+
+table(championsLeague$winner)
 
