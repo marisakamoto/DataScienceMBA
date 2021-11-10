@@ -71,6 +71,28 @@ dataset_recode <- dataset_renamed %>% mutate(stressLevel =
                                              afternoon = recode(Period, 'Manhã' = 0, 'Tarde' = 1))
 head(dataset_recode)
 
+#Create a dummy base
+
+dummy_profile <- mutate(dataset_recode, 
+                        Relax = recode(stressLevel, '1' = 1, '2' = 0, '3' = 0),
+                        Moderate = recode(stressLevel, '1' = 0, '2' = 1, '3' = 0),
+                        Agressive = recode(stressLevel, '1' = 0, '2' = 0, '3' = 1))
+
+View(dummy_profile)
+
+
+#Transmute: include variables and exclude others
+
+dataset_exclude <- dataset_start %>% transmute(Student, TimeToSchool, DistanceToSchool, new_var_1)
+View(dataset_exclude)
+
+#cut: classify the data
+
+dataset_time <- dataset_exclude %>% mutate(time_rank = cut(TimeToSchool, 
+                                                         c(0, median(TimeToSchool), Inf), 
+                                                         c('faster', 'slower')))
+View(dataset_time)
+
 #Example 2 -----------------------------------
 
 covid_source <- read.csv('E:/DataScienceMBA/RStudio/DataScienceMBA/02_DataWrangling/(2.2) WHO COVID-19 Global Table.csv',
@@ -95,4 +117,26 @@ covid_source <- covid_source %>% rename(country = 1,
                                         deathsLastWeek10000 = 11,
                                         deathsLastDay = 12,
                                         transmission = 13)
+#visualization
+table(covid_source$casesCum10000)
+unique(covid_source$transmission)
+View(covid_source)
+
+#cleaning data
+covid_source <- covid_source[-c(1),] #deletes first line
+covid_source <- covid_source[!(covid_source$country == 'Other'),] #deletes by name
+
+#slicing the data
+covid_source <- covid_source %>%  mutate(relativeCases =
+                                           cut(casesCum10000,
+                                               c(-Inf, quantile(covid_source$casesCum10000,
+                                                                type = 5,
+                                                                probs = c(0.25, 0.5, 0.75),
+                                                                TRUE),
+                                                 Inf),
+                                               c('quartileFirst', 'quartileSecond', 'quartileThird', 'quartileFourth')
+                                           ))
+
+table(covid_source$relativeCases)
+
 
