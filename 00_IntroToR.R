@@ -76,4 +76,86 @@ load('df_companies.RData')
 load('spam.RData')
 head(spam)
 
+# Reading data from a csv
+install.packages('readr')
+library(readr)
 
+bikes <- read_delim(file = "bicicletas.csv", delim = ";", escape_double = F, trim_ws = T)
+head(bikes)
+
+?read_delim
+# saving data in .csv
+write.csv(df_companies,file = 'companies.csv', row.names = F)
+
+
+# Reading data from a .xlsx
+library(readxl)
+
+stricto_2018 <- read_excel("stricto_2018.xlsx")
+head(stricto_2018)
+
+# Write data to a .xlsx
+install.packages("writexl")
+library(writexl)
+
+write_xlsx(df_companies,"companies.xlsx")
+
+#Importing online data
+covid <- read.csv("https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/csv/", 
+                  na.strings = "",
+                  fileEncoding = 'UTF-8-BOM')
+head(covid)
+
+# other good online reference 
+#http://archive.ics.edu/ml/datasts.php
+#http://www.kaggle.com
+
+
+
+#DATA MANIPULATION
+#There are some packages availablein R in the datasets pack
+help(package = 'datasets')
+data("mtcars")
+
+head(mtcars)
+tail(mtcars)
+
+str(mtcars) #structure of dataset
+
+nrow(mtcars)
+ncol(mtcars)
+dim(mtcars)
+
+names(mtcars) #variable names
+
+rm(mtcars) #remove data from your workspace
+mtcars
+gc()
+
+mtcars$mpg
+mtcars[1,"mpg"]
+mtcars[, c("mpg", 'cyl', 'disp')]
+mtcars[2:5 , 1:3] #[rows , columns]
+
+
+
+#attach makes easier to call the variable name without expliciting the name of the database
+
+attach(mtcars)
+
+gear
+mtcars[which(mpg == 21.0),]
+mtcars[which(mpg == 21.0 & qsec <17),]
+mtcars[which(mpg == 21.0 | qsec <17),]
+
+#to detach:
+detach(mtcars)
+mtcars[which(mtcars$mpg != 21.0),]
+
+#creating a new var
+mtcars$newVar <- NA
+head(mtcars)
+
+#deleting a var
+mtcars$newVar <- NULL
+head(mtcars)
