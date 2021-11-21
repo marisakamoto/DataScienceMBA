@@ -54,6 +54,25 @@ new_group_ds <- group_ds %>% group_by(Period, Profile) %>%
 
 View(new_group_ds)
 
+# filtering data with the basic R function
+glimpse(ds_start)
+filter_1 <- ds_start[ds_start$Time < 20,] 
+head(filter_1)
+
+filter_2 <- ds_start %>%  filter(Period == "Manhã" & between(Time, 20, 50))
+glimpse(filter_2)
+
+filter_3 <- ds_start %>%  filter(Period != "Manhã" | Time > mean(Time, na.rm = T))
+glimpse(filter_3)
+
+# you can filter among groups. For example the mean among each Period was 22.4 for Manhã and 48 for Tarde
+
+Period_group <- ds_start %>% group_by(Period)  %>%  summarise(mean = mean(Time)) %>% 
+  ungroup() %>% droplevels(.)
+View(Period_group)
+filter_4 <- ds_start %>% group_by(Period) %>% filter(Time > mean(Time, na.rm = T)) %>% 
+  ungroup() %>% droplevels(.)
+View(filter_4)
 #=====================Exercise 2.1. ====================#
 
 
@@ -148,7 +167,7 @@ quartile_covid <- covid_ds %>%  group_by(region) %>%
 View(quartile_covid)
 
 #=====================Exercise 6.1 ====================#
-
+# Database with info about movies and series 
 movies <- read.csv("(6.2) Filmes Streaming.csv")
 series <- read.csv("(6.3) Séries Streaming.csv")
 
@@ -162,4 +181,30 @@ cinema <- movies %>% select(everything(), -(Directors:Runtime)) %>%
 
 View(cinema)
 
-# Now lets cut 95%
+# Transforming the string to numeric (Rates in the platforms)
+?str_sub
+num_IMDb = as.numeric(str_sub(cinema$IMDb, 1 ,3))
+num_IMDb
+
+num_Rotten = as.numeric(str_sub(cinema$Rotten, 1 ,2))
+cinema <- cinema %>% mutate(num_IMDb, num_Rotten)
+
+# Create a dummy for the type of media
+cinema_type <- cinema %>%  mutate(Type = replace(Type, Type ==0 , "series"), 
+                             Type = replace(Type, Type == 1, "movie")) %>% 
+  group_by(Type) %>% 
+  summarise(aveIMDb = mean(num_IMDb, na.rm = T), 
+            aveRotten = mean(num_Rotten, na.rm = T), 
+            p95IMDb = quantile(num_IMDb, probs = 0.95, type = 5, na.rm = T),
+            p95Rotten = quantile(num_Rotten, probs = 0.95, type = 5, na.rm = T)) %>% 
+  ungroup() %>% droplevels(.)
+
+View(cinema_type)
+# Now lets cut 95% to create a database with the best movies and series
+
+
+top_series <- cinema %>% filter(Type == 1 & ) %>% 
+  
+
+
+
