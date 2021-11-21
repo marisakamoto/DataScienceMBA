@@ -9,6 +9,7 @@ library(dplyr)
 #reading the data
 dataset_start <- read_excel("E:/DataScienceMBA/RStudio/DataScienceMBA/02_DataWrangling/(1.2) Dataset Aula Data Wrangling.xls")
 
+
 #Visualization
 
 head(dataset_start, n = 10)
@@ -24,6 +25,7 @@ dataset_start$`Período do dia`
 dataset_start$Estudante
 
 # Rename dataset columns to a simpler one
+
 
 new_name <- c('Student', 
               'TimeToSchool', 
@@ -133,8 +135,7 @@ dataset_time %>% relocate(DistanceToSchool, .after = dist_rank) %>%
 array_pull <- dataset_time %>% pull(var = 1)
 array_pull
 
-
-#Example 2 -----------------------------------
+#======================Example 2.2 ==================================
 
 covid_source <- read.csv('E:/DataScienceMBA/RStudio/DataScienceMBA/02_DataWrangling/(2.2) WHO COVID-19 Global Table.csv',
                          header = TRUE,

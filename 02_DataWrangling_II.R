@@ -81,6 +81,75 @@ ds_start %>% slice_tail(n=3)
 ds_start %>% slice_min(order_by = Distance, prop = 0.2) #prop is the percentage min
 ds_start %>% slice_max(order_by = Distance, prop = 0.1)
 
+#Join tables
+# First, lets import another database
+dataset_merge <- read_excel("(1.3) Dataset Aula Data Wrangling (Join).xls")
+
+# we need to change the key name to match the other database
+dataset_merge <- dataset_merge %>% rename(Student = Estudante)
+head(dataset_merge)
+
+#now we can left join
+
+dataset_start %>% left_join(dataset_merge, by = 'Student')
+
+#now we can right join
+
+dataset_start %>% right_join(dataset_merge, by = 'Student')
+
+
+#now we can inner join
+
+dataset_start %>% inner_join(dataset_merge, by = 'Student')
+
+#now we can full join
+
+dataset_start %>% full_join(dataset_merge, by = 'Student')
+
+# Other types of JOIN: Semi and Anti (They do not join!)
+# Semi join compare but doesnt join datasets, it will display the xerything that is in dataset_start, and also in merge
+
+dataset_start %>% semi_join(dataset_merge, by = 'Student')
+
+#anti join will show the rows that are not in the merged dataset, this case Antonio.
+
+dataset_start %>% anti_join(dataset_merge, by = 'Student')
+
+
+#--------------------Bind-------------------------------------------------------
+
+# Existem formas simples de combinar datasets, adequados em casos particulares
+#  "bind" mix datasets without a key
+# this means variables and observations must be in the same order
+
+# some examples
+
+dataset_bind_1 <- tibble(var1 = c("obs1", "obs2", "obs3", "obs4"),
+                         var2 = 1:4,
+                         var3 = 10:13)
+
+dataset_bind_2 <- tibble(var4 = c("obs1", "obs2", "obs3", "obs4"),
+                         var5 = 100:103)
+
+dataset_bind_3 <- tibble(var6 = c("obs50", "obs51", "obs52", "obs53"),
+                         var7 = 1500:1503)
+
+dataset_bind_4 <- tibble(var1 = c("obs5", "obs6", "obs7", "obs8", "obs9"),
+                         var2 = 5:9,
+                         var3 = 14:18)
+
+# Bind cols (variables): same number of oservations and the same order
+
+dataset_bind_col <- bind_cols(dataset_bind_1, dataset_bind_2)
+
+# this case is wrong, observations do not match
+
+dataset_bind_1 %>% bind_cols(dataset_bind_3)
+
+# bind rows (observations): var in the same order
+dataset_bind_linhas <- bind_rows(dataset_bind_1, dataset_bind_4)
+
+
 #=====================Exercise 2.1. ====================#
 
 
@@ -174,6 +243,46 @@ quartile_covid <- covid_ds %>%  group_by(region) %>%
 
 View(quartile_covid)
 
+# lets merge with the PIB database
+
+PIB2019 <- read_excel("(2.3) WBD PIB per Capita.xls")
+glimpse(PIB2019)
+glimpse(covid_ds)
+
+covid_ds_2 <- PIB2019 %>% rename(country = "Country Name") %>% 
+  right_join(covid_ds, by = "country") %>% 
+  select(everything(), -`Country Code`) %>% 
+  rename(income = 'Income group') %>% 
+  mutate(income = recode(income,
+                         "High income" = "High", 
+                         "Upper middle income" ="Upper middle",
+                         "Lower middle income" = "Lower middle", 
+                         "Low income" = "Low"))
+head(covid_ds_2)
+
+#now lets group by the new info
+
+covid_ds_3 <- covid_ds_2 %>% group_by(income) %>% 
+  summarise(ave_cases = mean(cases_relative, na.rm = T), 
+            sd_cases = sd(cases_relative, na.rm = T), 
+            obs = n()) %>% 
+  ungroup() %>% droplevels(.) 
+head(covid_ds_3)
+
+#plot
+glimpse(covid_ds_3)
+
+covid_ds_3$income <- factor(covid_ds_3$income ,levels =  c('High', 'Upper middle', 'Lower middle', 'Low')) 
+
+ covid_ds_3 %>% 
+  ggplot()+ 
+  geom_col(aes(x = income, y = ave_cases), fill = "yellow") +
+  labs(x = "PIB Income Group", 
+       y = "Average of Relative Cases",
+       title = "Covid Cases per PIB")
+
+
+
 #=====================Exercise 6.1 ====================#
 # Database with info about movies and series 
 movies <- read.csv("(6.2) Filmes Streaming.csv")
@@ -233,3 +342,7 @@ top_movies <- cinema %>% filter(Type == 0) %>%
   filter(topIMDB==1 & topRotten ==1)
 
 View(top_movies)
+
+#=====================Exercise 2.3. ====================#
+
+
