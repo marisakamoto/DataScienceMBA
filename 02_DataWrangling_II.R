@@ -73,6 +73,14 @@ View(Period_group)
 filter_4 <- ds_start %>% group_by(Period) %>% filter(Time > mean(Time, na.rm = T)) %>% 
   ungroup() %>% droplevels(.)
 View(filter_4)
+
+# Slice - it filters based on position
+ds_start %>% slice(5:9)
+ds_start %>% slice_head(n=10)
+ds_start %>% slice_tail(n=3)
+ds_start %>% slice_min(order_by = Distance, prop = 0.2) #prop is the percentage min
+ds_start %>% slice_max(order_by = Distance, prop = 0.1)
+
 #=====================Exercise 2.1. ====================#
 
 
@@ -203,8 +211,25 @@ View(cinema_type)
 # Now lets cut 95% to create a database with the best movies and series
 
 
-top_series <- cinema %>% filter(Type == 1 & ) %>% 
+top_series <- cinema %>% filter(Type == 1) %>% 
+mutate(topIMDB = cut(num_IMDb, 
+                     c(-Inf, quantile(num_IMDb, probs = 0.95, type = 5, na.rm = T), Inf), #percentile 95
+                     c(0,1)),
+       topRotten = cut(num_Rotten,
+                       c(-Inf, quantile(num_Rotten, probs = 0.95, type = 5, na.rm=T), Inf),
+                       c(0,1))) %>% 
+filter(topIMDB==1 & topRotten ==1)
   
+View(top_series)
 
 
+top_movies <- cinema %>% filter(Type == 0) %>% 
+  mutate(topIMDB = cut(num_IMDb, 
+                       c(-Inf, quantile(num_IMDb, probs = 0.95, type = 5, na.rm = T), Inf), #percentile 95
+                       c(0,1)),
+         topRotten = cut(num_Rotten,
+                         c(-Inf, quantile(num_Rotten, probs = 0.95, type = 5, na.rm=T), Inf),
+                         c(0,1))) %>% 
+  filter(topIMDB==1 & topRotten ==1)
 
+View(top_movies)

@@ -62,6 +62,11 @@ df_companies <- data.frame( company, employers, stock_precence, national, ceo_na
 df_companies
 View(df_companies) #Use only if the data set is small
 
+## reordering
+relocate(df_companies, employers, .before = company)
+head
+
+select(df_companies, ceo_name, everything())
 ## rename the variables
 
 df_companies <- data.frame(company,employees= employers, 
@@ -158,4 +163,32 @@ head(mtcars)
 
 #deleting a var
 mtcars$newVar <- NULL
+head(mtcars)
+
+#editing some value
+mtcars[1,1] <- 82
+head(mtcars)
+
+#editing values with a pattern
+mtcars$cyl <-gsub(x = mtcars$cyl, pattern = 6, replacement = 8)
+head(mtcars)
+
+edit(mtcars)
+
+#you can check repetitive data by using unique
+# lets first create a intentional repetitive database
+
+example <- mtcars[1:3,]
+example_2 <- rbind(example, example, example)
+unique(example_2)
+
+cars <- mtcars
+rename(cars, nome = 4)
+head(mtcars)
+?rename
+
+relocate(mtcars, cyl, .before = mpg)
+head(mtcars)
+table(mtcars$cyl)
+table(mtcars, cyl, .after = mpg)
 head(mtcars)
