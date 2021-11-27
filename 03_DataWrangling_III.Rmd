@@ -2,7 +2,11 @@
 title: "03_DataWranglingIII"
 author: "Mariana Higashi Sakamoto"
 date: "27/11/2021"
-output: word_document
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
 ---
 
 
@@ -18,12 +22,19 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 
 You can format texts:
+
 - *italic*: * at the beginning and end of sentence
+
 - **bold**: addind ** at the beginning and end of sentence
+
 - To create bullet points just do: * at the beginning of the sentence
+
 * Title 1
+
 * Title 2
+
   * Subtitle 2
+  
   To do that give a tab
   
 To write something at the bottom use ~ at the beginnig and end of element
@@ -52,7 +63,7 @@ library(readxl)
 library(tidyverse)
 library(knitr)
 dados <- read_excel("./02_DataWrangling/(1.2) Dataset Aula Data Wrangling.xls")
-glimpse(dados)
+head(dados)
 ```
 Create a table
 ```{r create a table}
@@ -69,4 +80,7 @@ Create a graph
 dados_1 %>% ggplot() + geom_point(aes(x=distance, y= time))
 ```
 
+To be able to export as a pdf install:
+if tinytex:::is_tinytex()
+# tinytex::install_tinytex()
 
