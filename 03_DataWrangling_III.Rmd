@@ -4,20 +4,7 @@ author: "Mariana Higashi Sakamoto"
 date: "27/11/2021"
 output: word_document
 ---
-This are basic instructions that comes with tha layout
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
 
 ## Including Plots
 
@@ -58,4 +45,28 @@ Introducing chunks: thats where we are going to code
 array <- c(1:5)
 array
 ```
+
+Now lets import packages and a dataset
+```{r open Dataset, echo=TRUE, message=FALSE, warning=FALSE}
+library(readxl)
+library(tidyverse)
+library(knitr)
+dados <- read_excel("./02_DataWrangling/(1.2) Dataset Aula Data Wrangling.xls")
+glimpse(dados)
+```
+Create a table
+```{r create a table}
+dados_1 <- dados %>%rename(time = `Tempo para chegar à escola (minutos)` , 
+                 distance = `Distância percorrida até a escola (quilômetros)`) 
+
+dados_1  %>% 
+  summarise(ave_time = mean(time),
+            ave_dist = mean(distance)) %>% kable()
+```
+
+Create a graph
+```{r Create a plot}
+dados_1 %>% ggplot() + geom_point(aes(x=distance, y= time))
+```
+
 
