@@ -84,3 +84,6 @@ To be able to export as a pdf install:
 if tinytex:::is_tinytex()
 # tinytex::install_tinytex()
 
+
+
+

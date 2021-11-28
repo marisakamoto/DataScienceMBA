@@ -1,0 +1,79 @@
+---
+title: "World Data Index"
+author: "Mariana Higashi Sakamoto"
+date: "27/11/2021"
+output: html_document
+---
+
+#1. Importing the data
+
+```{r ImportingData}
+library(tidyverse) #to use pipe
+library(readxl)
+wdiDataset <- read_excel("(3.2) WDI World Bank Wrangling.xlsx")
+glimpse(wdiDataset)
+head(wdiDataset)
+
+```
+
+#2. Changing the structure of the dataset
+Here we only have 6 columns, and some variable names are on the rows (Series Name). We will try to verticalize the table so it is easier to make analisys with it.
+```{r OrganizingData}
+length(unique(wdiDataset$`Country Name`))
+length(unique(wdiDataset$`Series Name`))
+length(unique(wdiDataset$`Series Code`))
+length(unique(wdiDataset$Topic))
+
+wdiDataset <- wdiDataset %>% rename(country = 1, 
+                                    country_cod = 2, 
+                                    series = 3,
+                                    series_cod = 4, 
+                                    YR2019 = 5,
+                                    topic = 6)
+glimpse(wdiDataset)
+
+```
+2.1 Converting char to numeric
+
+```{r}
+wdiDataset <- wdiDataset %>% mutate(YR2019 = na_if(YR2019, ".."))
+YR2019_num <- as.numeric(wdiDataset$YR2019)
+wdiDataset <- wdiDataset %>% mutate(YR2019_num) %>% 
+  select(everything(), -YR2019, YR2019_num)
+glimpse(wdiDataset)
+```
+#3. Filtering only Health topics
+
+```{r}
+wdiHealth <- wdiDataset %>% filter(str_detect(topic, '^Health')) # ^filter all observations that begin with Health
+unique(wdiHealth$topic)
+glimpse(wdiHealth)
+```
+#4. Make dataset wider (rows into variables) 
+```{r}
+wdiHealth_wide <- pivot_wider(wdiHealth, id_cols = c("country","country_cod", "topic"),
+                                       names_from = "series", 
+                                       values_from = "YR2019_num")
+head(wdiHealth_wide)
+
+```
+# 5. Adding information about PIB income group into the dataset
+```{r}
+income <- read_excel("(2.3) WBD PIB per CApita.xls")
+glimpse(income)
+healthIncome <- wdiHealth_wide %>% rename("Country Code" = country_cod) %>% 
+  left_join(income, by = "Country Code") %>% 
+  select(everything(), -c("Country Name", "2019"))
+
+#Counting the NA values in each row
+NA_count <- healthIncome %>% summarise_all(~ sum(is.na(.)))
+
+filter_relevant <- colnames(NA_count[1,])[(NA_count[1,] < 2420)]
+filter_relevant
+
+healthIncome %>%  select(everything(), -c(filter_relevant))
+
+
+```
+
+
