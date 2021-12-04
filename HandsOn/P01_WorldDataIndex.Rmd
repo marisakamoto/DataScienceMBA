@@ -10,7 +10,7 @@ output: html_document
 ```{r ImportingData}
 library(tidyverse) #to use pipe
 library(readxl)
-wdiDataset <- read_excel("(3.2) WDI World Bank Wrangling.xlsx")
+wdiDataset <- read_excel("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(3.2) WDI World Bank Wrangling.xlsx")
 glimpse(wdiDataset)
 head(wdiDataset)
 
@@ -59,7 +59,7 @@ head(wdiHealth_wide)
 ```
 # 5. Adding information about PIB income group into the dataset
 ```{r}
-income <- read_excel("(2.3) WBD PIB per CApita.xls")
+income <- read_excel("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(2.3) WBD PIB per CApita.xls")
 glimpse(income)
 healthIncome <- wdiHealth_wide %>% rename("Country Code" = country_cod) %>% 
   left_join(income, by = "Country Code") %>% 
@@ -75,5 +75,40 @@ healthIncome %>%  select(everything(), -c(filter_relevant))
 
 
 ```
+```{r}
+# 6. Adding continents
+
+covid_ds <- read_csv("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(2.2) WHO COVID-19 Global Table.csv")
+
+var_names <- c('Name', 'WHO Region')
+country_continents <- distinct(covid_ds[var_names], .keep_all = F) 
+country_continents
+
+names(country_continents) <- c('country', 'region')
+
+head(healthIndex)
+healthIncomeContinent <- healthIncome %>% 
+  left_join(country_continents, by = "country") 
+
+glimpse(healthIncomeContinent)
 
 
+healthIncomeContinent %>% group_by(region, `Income group` ) %>% 
+  summarise(Population_Total = sum(`Population, total` , na.rm = T)/1000000) %>% 
+  ungroup() %>% droplevels(.) 
+  
+`Population growth (annual %)`
+healthIncomeContinent %>% group_by(region, `Income group` ) %>% 
+  summarise(pop_growth = mean(`Population growth (annual %)` , na.rm = T)) %>% 
+  ungroup() %>% droplevels(.) 
+  
+
+healthIncomeContinent %>% group_by(region, `Income group` ) %>% 
+  summarise(suicide_rate = mean(`Suicide mortality rate (per 100,000 population)` , na.rm = T)) %>% 
+  ungroup() %>% droplevels(.) 
+
+healthIncomeContinent %>% group_by(region, `Income group` ) %>% 
+  summarise(life_expectancy = mean(`Life expectancy at birth, total (years)`   , na.rm = T)) %>% 
+  ungroup() %>% droplevels(.) 
+```
+  

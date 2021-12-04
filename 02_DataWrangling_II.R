@@ -153,7 +153,7 @@ dataset_bind_linhas <- bind_rows(dataset_bind_1, dataset_bind_4)
 #=====================Exercise 2.1. ====================#
 
 
-covid_raw <- read.csv("(2.2) WHO COVID-19 Global Table.csv", 
+covid_raw <- read.csv("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(2.2) WHO COVID-19 Global Table.csv", 
                        header = TRUE, 
                        sep = ",",
                        dec = ".")
@@ -245,7 +245,7 @@ View(quartile_covid)
 
 # lets merge with the PIB database
 
-PIB2019 <- read_excel("(2.3) WBD PIB per Capita.xls")
+PIB2019 <- read_excel("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(2.3) WBD PIB per Capita.xls")
 glimpse(PIB2019)
 glimpse(covid_ds)
 
@@ -285,8 +285,8 @@ covid_ds_3$income <- factor(covid_ds_3$income ,levels =  c('High', 'Upper middle
 
 #=====================Exercise 6.1 ====================#
 # Database with info about movies and series 
-movies <- read.csv("(6.2) Filmes Streaming.csv")
-series <- read.csv("(6.3) Séries Streaming.csv")
+movies <- read.csv("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(6.2) Filmes Streaming.csv")
+series <- read.csv("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(6.3) Séries Streaming.csv")
 
 glimpse(movies)
 glimpse(series)
