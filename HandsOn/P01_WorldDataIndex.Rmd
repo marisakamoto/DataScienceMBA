@@ -68,7 +68,7 @@ healthIncome <- wdiHealth_wide %>% rename("Country Code" = country_cod) %>%
 #Counting the NA values in each row
 NA_count <- healthIncome %>% summarise_all(~ sum(is.na(.)))
 
-filter_relevant <- colnames(NA_count[1,])[(NA_count[1,] < 2420)]
+filter_relevant <- colnames(NA_count[1,])[(NA_count[1,] < 2600)]
 filter_relevant
 
 healthIncome %>%  select(everything(), -c(filter_relevant))
