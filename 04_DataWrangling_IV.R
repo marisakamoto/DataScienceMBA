@@ -1,7 +1,4 @@
-#Aula 5 - 30Nov = Functions
-
-
-
+#Aula 5 - 30Nov = Function
 # Funções - Referência: (https://r4ds.had.co.nz/functions.html)
 
 
@@ -61,3 +58,34 @@ max_100 <- function(old){
 }
 max_100(20)
 max_100(90)
+
+#mixing functions in a function
+
+percentile_var <- function(x){
+  perc <- quantile(x, probs = c(0.25,0.5,0.75), type = 5, na.rm = T)
+  return(perc)
+}
+
+percentile_var(cars$speed)
+percentile_var(cars$dist)
+
+#package purrr creates functions that make iterations easier
+library(purrr)
+library(readxl)
+school_transport <- read_excel("(1.2) Dataset Aula Data Wrangling.xls")
+
+new_names <- c("Obs",
+                 "Time",
+                 "Distance",
+                 "TrafficLights",
+                 "Period",
+                 "Profile")
+names(school_transport) <- new_names
+
+head(school_transport)
+input <- c('Time', 'Distance', 'TrafficLights')
+
+map_dbl(school_transport[input], mean, na.rm = T)
+
+
+
