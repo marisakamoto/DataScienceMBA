@@ -1,0 +1,75 @@
+---
+title: "Statistics Fundamentals"
+author: "Mariana Higashi Sakamoto"
+date: "04/12/2021"
+output: html_document
+---
+
+#1. Question
+In the analysis of the granting of loans, a potentially important variable is the person's
+income. The manager of a bank collects a database from their account holders and
+extracts the variable “monthly income (R$)” for 50 people. Although it is a quantitative
+variable, they want to perform an analysis through a frequency table. Therefore, it is
+asked:
+  a) Classify the account holders in the income ranges, being: 0-2,000; 2,001-4.000;
+4.001- 6.001-8.000; 8.001-10.000 and 10.001-12.000.
+  b) Next, elaborate the frequency table for the income ranges above.
+  
+##Solution
+First, lets read the data and order them
+```{r}
+library(tidyverse)
+library(dplyr)
+library(readr)
+STATQ1_Income <- read_delim("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/STATQ1_Income.csv", 
++     ";", escape_double = FALSE, col_types = cols(Observacao = col_integer()), 
++     locale = locale(decimal_mark = ","), 
++     trim_ws = TRUE)
+STATQ1_Income$Renda
+
+names(STATQ1_Income) <- c('id', 'income')
+
+
+income <- STATQ1_Income[order(STATQ1_Income$income, decreasing = T),]
+head(income)
+
+```
+Now, lets group them in factors
+
+```{r}
+income_ds <- income %>% mutate(income_rate = case_when(c(income) <= 2000 ~'0-2.000',
+                                          c(income) <= 4000 ~'2.001-4.000',
+                                          c(income) <= 6000 ~'4.001-6.000',
+                                          c(income) <= 8000 ~'6.001-8.000',
+                                          c(income) <= 10000 ~'8.001-10.000',
+                                        c(income) > 10000 ~'10.001-12.000'
+                                          ))
+income_ds$income_rate <- factor(income_ds$income_rate ,levels =  c('0-2.000',
+                                  '2.001-4.000',
+                                  '4.001-6.000',
+                                  '6.001-8.000',
+                                  '8.001-10.000',
+                                  '10.001-12.000')
+  )
+sample_total <- nrow(income_ds)
+sample_total
+
+
+income_summary <- income_ds %>% group_by(income_rate) %>% 
+  summarise(freq = n(), relative_freq = n()/sample_total*100) %>%
+  ungroup() %>% 
+  droplevels(.)
+income_summary
+```
+
+
+```{r}
+
+income_summary %>% 
+  ggplot(aes(income_rate,freq))+
+  geom_col() +
+  labs(title="Customers Income", x= "Income Rate", y = "Frequency")+
+  geom_text(aes(label = signif(freq, digits = 3)), nudge_y = 1)
+
+```
+
