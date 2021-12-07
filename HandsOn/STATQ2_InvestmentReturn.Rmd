@@ -1,0 +1,176 @@
+---
+title: "Statistic Fundamentals - Question 2"
+author: "Mariana Higashi Sakamoto"
+date: "05/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 2. 
+
+An analyst of the share market collected the monthly returns of two shares that they 
+intend to recommend to their clients. Calculate the descriptive statistics for the two 
+variables, including the correlation coefficient between returns.
+## Answer
+
+1. Setting up the dataset:
+```{r setup}
+library(tidyverse)
+library(readr)
+
+STATQ2_Stocks <- read_delim("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/STATQ2_Stocks.csv", 
+    ";", escape_double = FALSE, col_types = cols(Meses = col_integer()), 
+    locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE)
+head(STATQ2_Stocks)
+
+
+names(STATQ2_Stocks) <- c("months", 'share1', 'share2')
+glimpse(STATQ2_Stocks)
+```
+
+2. Visualizing the data in a plot:
+```{r stats}
+STATQ2_Stocks %>% ggplot(aes(x=months)) + 
+  geom_line(aes( y = share1, colour= "Share 1") ) +
+  geom_line(aes( y = share2, colour= "Share 2")) +
+  scale_color_manual(name = "Investment", values = c("Share 1" = "steelblue", "Share 2" = "darkred")) +
+  labs(y = "Return", x = "Months")
+
+```
+3. Exploring the statistics:
+```{r statistics}
+
+print(summary(STATQ2_Stocks))
+```
+
+```{r histogram}
+STATQ2_Stocks[,c('share1', 'share2')] %>%  boxplot(main = "Share Return Distribution") %>%
+  abline(h = 0, col = "red",lty = 2 )
+```
+From the boxplot and table, it is possible to notice that Share 2 had a better return than share 1. Not only the mean is higher, but the median and the boxplot is on a higher return rate than share 1.
+
+4. Some other statistics:
+```{r descriptives}
+
+stock_1 <- STATQ2_Stocks[ ,c(1,2)] %>% mutate(share = 1)
+names(stock_1) <- c('months', 'return', 'share')
+
+stock_2 <- STATQ2_Stocks[ ,c(1,3)] %>% mutate(share = 2)
+names(stock_2) <- c('months', 'return', 'share')
+
+stocks <- bind_rows(stock_1, stock_2)
+head(stocks)
+
+stocks
+stocks  %>% group_by(share) %>% summarise(dec_8 = quantile(return, probs = 0.8, na.rm = T),
+                                          dec_9 =  quantile(return, probs = 0.9, na.rm = T),
+                                          perc_27 = quantile(return, probs = 0.27, na.rm = T),
+                                          perc_64 = quantile(return, probs = 0.64, na.rm = T),
+                                          amplitude = max(return) - min(return),
+                                          sd_share = sd(return),
+                                          variance = sd_share^2,
+                                          n_obs = n(),
+                                          sd_error = sd_share / n_obs^0.5,
+                                         var_coef = sd_share / mean(return)
+                                         )
+  
+```
+5. Correlation
+
+The correlation between the two shares is 0.291.
+```{r}
+cor_share <- cor(stock_1$return, stock_2$return)
+cor_share
+```
+To verify if this correlation is statistically significant we test these hypothesis:
+
+  h_0: the correlation is statistically 0
+  h_1: the correlation s different than 0
+  
+In order to do that, we need to do a bilateral test with a t-Student distribution curve. But first a recap on T ditribution and R functions:
+
+The R software provides access to the t-distribution by the dt(), pt(), qt() and rt() functions. 
+
+The rt() function generates random deviates of the t-distribution and is written as rt(n, df). We may easily generate n number of random samples. Recall that he number of degrees of freedom for a t-distribution is equal to the sample size minus one
+
+
+```{r}
+n <- 23
+df <- n - 1
+rt(n, df)
+```
+Further we may generate a very large number of random samples and plot them as a histogram.
+```{r}
+
+n <- 10000
+df <- n - 1
+samples <- rt(n, df)
+hist(samples, breaks = 'Scott', freq = FALSE) 
+
+x <- seq(-22, 22, by = 2)
+dt(x, df = n)
+```
+By using the dt() function we may calculate the probability density function, and thus, the vertical distance between the horizontal axis and the t-curve at any point. For the purpose of demonstration we construct a t-distribution with df=5 and calculate the probability density function at t=−4,−2,0,2,4.
+
+```{r}
+x <- seq(-4, 4, by = 2)
+dt(x, df = 23)
+```
+
+Another very useful function is the pt() function, which returns the area under the t-curve for any given interval. 
+
+```{r}
+df <- 23
+ji <- c(-2,0,2)
+pt(ji, df = df, lower.tail = TRUE)
+```
+
+The qt() function returns the quantile function, and thus it is the reversing function of pt()
+
+```{r}
+x <- seq(-2, 2, by = 2)
+ki <- pt(x, df = 5, lower.tail = FALSE)
+ki
+
+qt(ki, df = 5, lower.tail = FALSE)
+
+```
+
+Now let't return to the problem, we want to test with a confidence level of 5%, that the correlation is significant, using the 23-1 = 22 degrees of freedom.
+
+The t-value that makes the area under the t-distribution on the lower and upper tail equal to 5% is:
+
+```{r}
+
+ki <- c(0.05/2, 1-0.05/2)
+xi <- qt(ki, df = 23-2, lower.tail = FALSE)
+xi
+```
+
+Now lets compare the t-value associated to the correlation
+$$ t = \dfrac {r} {\sqrt{\dfrac {1-r^2} {n-2}}}$$
+```{r}
+t_cor <- cor_share / sqrt((1-cor_share^2)/(23-2))
+t_cor
+```
+
+Because t_cor < 2.08 and t_cor > -2.08, the hypothesis 0 is not rejected. Therefore, the correlation is statistically significant.
+
+## Conclusion
+
+```{r}
+n <- 10000
+df <- n - 1
+c(xi)
+samples <- rt(n, df)
+hist(samples, breaks = 'Scott', freq = FALSE)
+  abline(v = t_cor, col = "green")
+  abline(v = c(xi), col = "red")
+```
+
+
+
