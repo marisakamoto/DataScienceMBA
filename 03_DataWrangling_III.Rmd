@@ -62,7 +62,7 @@ Now lets import packages and a dataset
 library(readxl)
 library(tidyverse)
 library(knitr)
-dados <- read_excel("./02_DataWrangling/(1.2) Dataset Aula Data Wrangling.xls")
+dados <- read_excel("E:/DataScienceMBA/RStudio/DataScienceMBA/DataSource/(1.2) Dataset Aula Data Wrangling.xls")
 head(dados)
 ```
 Create a table
