@@ -1,0 +1,90 @@
+---
+title: "Question 3 - Statistics"
+author: "Mariana Higashi Sakamoto"
+date: "11/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Question 3
+In a certain game, probability of victory (success) for each new move is 1/6. If 10
+moves are done, which are the following probabilities:
+
+#### a) Having a victory in 4 moves.
+
+In a Bernoulli Distribution, if a variable can only assume two possible results: success (x = 1) or failure (x = 0).
+
+$$ P(X) = p^x.(1-p)^{1-x}$$
+Which is very obvious, if we have a 1/6 chance to win, he probability to lose is:
+$$  P(X=0) = \left(\dfrac{1}{6}\right)^0.\left(1-\dfrac{1}{6}\right)^{1-0}=\dfrac{5}{6} $$
+
+And the probability to win is:
+$$  P(X=1) = \left(\dfrac{1}{6}\right)^1.\left(1-\dfrac{1}{6}\right)^{1-1}=\dfrac{1}{6} $$
+In this case, we have a Binomial Distribution, that derives from the Bernoulli distribution. It happens when there are n independent repetitions of a Bernoulli Experiment and the success probability (p) is equal in all repetitions. 
+
+$$P(X=k)-(^n_k).p^k.(1-p)^{n-k}$$
+Where k is the number of successes in n attempts to do the Bernoulli experiment. $(^n_k) = \dfrac{n!}{k!(n-k)!}$
+
+```{r question_3a}
+
+p <- 1/6
+n <- 10
+k <- 4
+
+P1 <- dbinom(k, size = n, prob = p)
+P1
+P2 <- factorial(n)/ (factorial(k)*factorial(n-k))*p^k*(1-p)^(n-k)
+P2
+
+cat("The probability of winning in 4 moves is ", P1*100, "%")
+```
+
+
+b) Having a victory in at least 7 moves.
+
+```{r}
+
+p <- 1/6
+n <- 10
+k <- c(7:10)
+
+P1 <- dbinom(k, size = n, prob = p)
+P1
+
+P2 <- factorial(n)/ (factorial(k)*factorial(n-k))*p^k*(1-p)^(n-k)
+P2
+
+cat("The probability of winning in at least 7 moves is ", sum(P1)*100, "%")
+```
+
+```{r}
+p <- 1/6
+n <- 10
+k <- c(1:10)
+
+probabilities <-dbinom(k, size = n, prob = p)
+data.frame(probabilities)
+plot(probabilities)
+
+```
+
+#### Extra about dbinom function
+
+Binomial distribution in R is a probability distribution used in statistics. The binomial distribution is a discrete distribution and has only two outcomes i.e. success or failure. All its trials are independent, the probability of success remains the same and the previous outcome does not affect the next outcome. The outcomes from different trials are independent. Binomial distribution helps us to find the individual probabilities as well as cumulative probabilities over a certain range.
+
+It is also used in many real-life scenarios such as in determining whether a particular lottery ticket has won or not, whether a drug is able to cure a person or not, it can be used to determine the number of heads or tails in a finite number of tosses, for analyzing the outcome of a die, etc.
+
+*Functions for Binomial Distribution*
+We have four functions for handling binomial distribution in R namely:
+
+  - *dbinom() Function* This function is used to find probability at a particular value for a data that follows binomial distribution, it finds: P(X = k)
+    dbinom(k, n, p)
+  - *pbinom() Function* The function pbinom() is used to find the cumulative probability of a data following binomial distribution till a given value ie it finds P(X <= k).
+    pbinom(k, n, p)
+  - *qbinom() Function* This function is used to find the nth quantile, that is if P(x <= k) is given, it finds k
+    qbinom(P, n, p)
+  - *rbinom() Function* This function generates n random variables of a particular probability. 
+    rbinom(n, N, p)
+
