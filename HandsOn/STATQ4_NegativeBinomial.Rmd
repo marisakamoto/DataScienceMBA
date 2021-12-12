@@ -1,0 +1,96 @@
+---
+title: "Question 4 - Statistics"
+author: "Mariana Higashi Sakamoto"
+date: "11/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Question 4
+(Source: Fávero and Belfiore, 2017, Cap. 5) Suppose a student answer right three questions for each five tests. Being X the number of attempts up to the 12th right one.
+Determine the probability of the student needing to do 20 questions to get 12 right.
+### Review
+
+Negative Binomial Distribution
+This time, we want to analyze how many independent Bernoulli experiments (x) is needed to obtain k successes.
+
+This distribution differs from the Binomial Distribution:
+  **Binomial**: distribution of the number of successes in a fixed number of independent Bernoulli trials
+  **Negative Binomial**: distribution of the number of trials (or failures) needed to get a fixed number of successes
+
+$$ P(X=x)=\left( ^{x-1}_{k-1}\right).p^k.(1-p)^{x-k}  $$
+Where $(^{x-1}_{k-1}) = \dfrac{(x-1)!}{(k-1)![(x-1)-(k-1)]!}$
+
+### Answer
+```{r}
+r = 12
+p = 3/5
+n = 20 - r
+
+# exact
+P1<- dnbinom(x = n, size = r, prob = p)
+P1*100
+
+P2 <- factorial(x-1)/( (factorial(k-1)*factorial((x-1)-(k-1))))*p^k*(1-p)^(x-k)
+P2*100
+
+cat("The probability of winning in at least 7 moves is ", sum(P1)*100, "%")
+```
+
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+
+data.frame(x = 0:20, prob = dnbinom(x = 0:20, size = r, prob = p)) %>%
+  mutate(Failures = ifelse(x == n, n, "other")) %>%
+ggplot(aes(x = factor(x), y = prob, fill = Failures)) +
+  geom_col() +
+  geom_text(
+    aes(label = round(prob,2), y = prob + 0.01),
+    position = position_dodge(0.9),
+    size = 3,
+    vjust = 0
+  ) +
+  labs(title = "Probability of r = 12 Successes in X = 20 Trials",
+       subtitle = "NB(3,.2)",
+       x = "Failed Trials (X - r)",
+       y = "Probability") 
+```
+```{r}
+cum_prob <- data.frame(x = 1:20, 
+           pmf = dnbinom(x = 1:20, size = r, prob = p),
+           cdf = pnbinom(q = 1:20, size = r, prob = p, lower.tail = TRUE))
+cum_prob
+cum_prob %>%
+ggplot(aes(x = factor(x), y = cdf)) +
+  geom_col() +
+  geom_text(
+    aes(label = round(cdf,2), y = cdf + 0.01),
+    position = position_dodge(0.9),
+    size = 3,
+    vjust = 0
+  ) +
+  labs(title = "Cumulative Probability of X = x failed trials to achieve 12nd success",
+       subtitle = "NB(12,.6)",
+       x = "Failed Trials (x)",
+       y = "probability") 
+```
+
+#### More about R Functions
+
+R Functions dnbinom, pnbinom, and rnbinom
+
+Random varaible X is distributed X∼NB(r,p) with mean μ=rp and variance σ2=r(1−p)p2 if X is the count of independent Bernoulli trials required to achieve the rth successful trial when the probability of success is constant p. 
+
+The probability of X=n trials is f(X=n)=(n−1r−1)pr(1−p)n−r.
+
+  - R function dnbinom(x, size, prob) is the probability of x failures prior to the rth success (note the difference) when the probability of success is prob.
+  - R function pgeom(q, prob, lower.tail) is the cumulative probability (lower.tail = TRUE for left tail, lower.tail = FALSE for right tail) of less than or equal to q failures prior to success.
+  - R function rgeom(n, size, prob) returns n random numbers from the geometric distribution x~geom(prob).
+  - R function qgeom(p, prob, lower.tail) is the number of failures at the qth percentile (lower.tail = TRUE).
