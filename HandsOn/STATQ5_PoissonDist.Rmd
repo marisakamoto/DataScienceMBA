@@ -1,0 +1,40 @@
+---
+title: "Question 5 - Statistics"
+author: "Mariana Higashi Sakamoto"
+date: "12/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Question 5
+
+5. (Source: Fávero and Belfiore, 2017, Cap. 5) Suppose in a certain hospital, 3 people are operated daily with a stomach surgery, following a Poisson distribution. Calculate the probability of 28 people being operated in the next week (7 working days).
+
+
+#### Review: Poisson Distribution
+The Poisson distribution can be applied to systems with a large number of possible events, each of which is rare. The number of such events that occur during a fixed time interval is, under the right circumstances, a random number with a Poisson distribution.
+
+$$  f(k,\lambda) = P(X=k)=\dfrac{\lambda^ke^{-\lambda}}{k!} $$
+
+The equation can be adapted if, instead of the average number of events ${\displaystyle \lambda} $, we are given the average rate r at which events occur. Then ${\displaystyle \lambda =rt}$, and
+
+$$ P(k, t)= \dfrac{ (rt)^k.e^{-rt}}{k!} $$
+#### Solution
+```{r}
+
+poisson <- function(lambda,k) {
+  p<-(lambda)^k*exp(-lambda)/factorial(k)*100
+  return (p)
+} 
+
+poisson(lambda=3, k = 28/7)
+
+dpois(28/7, 3)
+
+plot(data.frame(c(0:10),dpois(c(0:10),3)), type = "b") + abline(v=28/7, col="red")
+
+
+```
+

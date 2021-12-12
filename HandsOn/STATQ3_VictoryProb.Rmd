@@ -42,7 +42,7 @@ cat("The probability of winning in 4 moves is ", P1*100, "%")
 ```
 
 
-b) Having a victory in at least 7 moves.
+#### b) Having a victory in at least 7 moves.
 
 ```{r}
 
@@ -69,6 +69,8 @@ data.frame(probabilities)
 plot(probabilities)
 
 ```
+
+
 
 #### Extra about dbinom function
 
