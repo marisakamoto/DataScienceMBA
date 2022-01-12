@@ -33,7 +33,7 @@ poisson(lambda=3, k = 28/7)
 
 dpois(28/7, 3)
 
-plot(data.frame(c(0:10),dpois(c(0:10),3)), type = "b") + abline(v=28/7, col="red")
+plot(data.frame(c(0:10),dpois(c(0:10),3)), type = "b", lty = 2) + abline(v=28/7, col="red")
 
 
 ```
