@@ -1,0 +1,19 @@
+---
+title: "question 6 - Normal Distribution"
+author: "Mariana Higashi Sakamoto"
+date: "12/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+6. In the last months, the time was measured between the beginning and end of one of 
+the stages of the production process of a certain product. The average time was 
+calculated in 26.5 minutes and the standard deviation was 4.0 minutes. Knowing that 
+this variable follows a normal distribution, identify the following information:
+
+a) P(X>37)
+b) P(X<20)
+c) P(22<X<28)
+
