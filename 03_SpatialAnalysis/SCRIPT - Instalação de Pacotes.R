@@ -3,7 +3,7 @@
 
 pacotes <- c("rgdal","raster","tmap","maptools","sf","rgeos","sp","adehabitatHR",
              "tidyverse","broom","rayshader","knitr","kableExtra","RColorBrewer",
-             "profvis")
+             "profvis","measurements", "plotly")
 
 if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
   instalador <- pacotes[!pacotes %in% installed.packages()]

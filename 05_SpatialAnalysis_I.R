@@ -52,9 +52,6 @@ plot(shp_sp)
 
 # Vamos supor que haja a necessidade do cálculo das áreas dos municípios
 # paulistas. Podemos fazer isso com a função area():
-raster::area(shp_sp)
-
-raster::area(shp_sp) / 1000000
 
 shp_sp@data["area_aproximada"] <- raster::area(shp_sp) / 1000000
 
@@ -114,13 +111,15 @@ shp_dados_sp@data %>%
 # adotado pelo curso
 
 
-# 2. VISUALIZAÇÃO DE DADOS ESPACIAIS
+# 2. Visualizing spatial data 
 
 
 # Utilizando o ggplot2: ---------------------------------------------------
 
 # Passo 1: Transformar o shapefile num objeto do tipo data frame e, depois,
 # importar os dados que já estavam no shapefile para o novo objeto data frame.
+
+summary(shp_dados_sp)
 shp_dados_df <- tidy(shp_dados_sp, region = "CD_GEOCMU") %>% 
   rename(CD_GEOCMU = id) %>% 
   left_join(shp_dados_sp@data,
@@ -133,12 +132,26 @@ shp_dados_df %>%
                color = "black") +
   labs(x = "Longitude",
        y = "Latitude",
-       color = "IDH") +
+       fill = "IDH") +
   scale_fill_viridis_c() +
   theme_bw()
 
+# you can animate the map, by when hovering the mouse it gives you some information on the area
+plotly::ggplotly(
+  shp_dados_df %>% 
+    ggplot() +
+    geom_polygon(aes(x = long, y = lat, group = group, fill = idh, label= NM_MUNICIP),
+                 color = "black") +
+    labs(x = "Longitude",
+         y = "Latitude",
+         fill = "IDH") +
+    scale_fill_viridis_c() +
+    theme_bw()
+)
 
+help(package = "tm_shape")
 # Utilizando a tmap: ------------------------------------------------------
+library(tmap)
 tm_shape(shp = shp_dados_sp) +
   tm_fill(col = "idh", palette = "Blues")
 
@@ -210,7 +223,7 @@ tm_shape(shp = shp_dados_sp) +
 shp_mundo <- readOGR(dsn = "shapefile_mundo", layer = "mundo")
 
 # Visualizando o shapefile shp_mundo:
-tm_shape(shp = shp_mundo) + 
+tmap::tm_shape(shp = shp_mundo) + 
   tm_borders()
 
 # Observando as variáveis da base de dados do objeto shp_mundo:
