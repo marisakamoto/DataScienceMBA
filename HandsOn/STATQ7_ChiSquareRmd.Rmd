@@ -1,0 +1,97 @@
+---
+title: "Question 7"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 7. Question
+(Source: Fávero and Belfiore, 2017, Cap. 8) A group of 60 readers did an assessment
+of three novel books and, at the end, they chose one of the three options. Test the null
+hypothesis that there is no difference in the preference of the readers, at the significance
+level of 5%.
+
+```{r}
+readers <- c(29,15,16)
+book <- c('A', 'B', 'C')
+
+df <- data.frame(book, readers)
+df
+```
+## Review
+
+
+Chi-square test examines whether rows and columns of a contingency table are statistically significantly associated.
+
+Null hypothesis (H0): the row and the column variables of the contingency table are independent.
+Alternative hypothesis (H1): row and column variables are dependent
+For each cell of the table, we have to calculate the expected value under null hypothesis.
+
+For a given cell, the expected value is calculated as follow:
+
+$$ \chi^2=\sum \dfrac {(o-e)^2} {e}$$
+This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with $df=(r−1)(c−1)$ degrees of freedom and p = 0.05.
+
+r is the number of rows in the contingency table
+c is the number of column in the contingency table
+
+## Solution
+In this case, we want to test if there is not a preference in the books choice.
+  $h_0$: frequencies observed and expected are equal
+  $h_1$: frequencies observed and expected are different
+
+If that was the case, we would expect an equal distribution of readers
+
+```{r setup, warning=FALSE}
+library(dplyr)
+expect <- c(20,20,20)
+df$readersExp <-expect
+df
+```
+
+In this case, we want to test if there is not a preference in the books choice.
+If that was the case, we would expect an equal distribution of readers
+
+```{r setup, warning=FALSE}
+totalReaders <-sum(readers)
+
+expect <- c(20,20,20)
+df$freq <-readers/totalReaders
+df
+```
+
+And then we calculate each observation associatd value of Chi-Square
+```{r}
+df$chiSquare <-   (readers - expect)^2 /expect
+df
+```
+Now, there are two ways to reject or accept the null hipothesis:
+  i) Calculate the critical Chi-Square value with the aimed significance level
+  ii) Calculate the p-value of the calculated Chi-Square
+  
+```{r}
+totalChiSquare <- sum(df$chiSquare)
+
+rows <-3
+cols <-2
+degFree <- (rows - 1)*(cols-1)
+
+
+criticalChi <- qchisq(0.05,df=degFree, lower.tail = FALSE)
+
+# Because the totalChiSquare (6,1) is biiger than the critical statistics (5.99), we reject the null hipothesis and can say there is a preference among readers
+```
+Another way
+
+```{r}
+totalChiSquare <- sum(df$chiSquare)
+
+pchisq(totalChiSquare,df =degFree, lower.tail = FALSE)
+
+# Because the p-value associated with a 5% significance level is bigger than the associated p-value statistics (4,7%), we reject the null hipothesis and can say there is a preference among readers
+```
