@@ -1,0 +1,72 @@
+---
+title: "STATQ8_testF"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+## Question 8. 
+
+Data was collected on the amount of rain per day (in millimeters), for 14 days, for two different places. The researcher noticed that place A appears to have greater variability in the rain amount, compared to place B. 
+In this sense, they want to test the hypothesis that the variability in the amount of rain is significantly greater in A than in B. 
+
+Perform the F-test to test this hypothesis.
+
+```{r}
+library()
+
+place_A <- c(8.9,7.7,8.6,3.9,7.6,10.2,9.6	,8.9,9.6,5.5,0.5,1.5,1.5,4.00)
+place_B <- c(5.6,4.9,6.6,5.9,6.5,5.9,3.6,5.6,8.8,7.8,9.9,11,8.3,5.5)
+
+df_rain <- data.frame(place_A, place_B)
+print(df_rain)
+
+```
+## Answer
+We want to test the hipothesis of place A having a greater variability than B.
+  $h_0$: The variancies are statistically the same
+  $h_1$: The variancies are statistically different
+
+In order to do so, we can calculate the F-statistic of this two variances:
+
+$$F = \dfrac {S_A^2} {S_B^2}$$ 
+The degrees of freedom are $n_A−1$ (for the numerator) and $n_B−1$ (for the denominator).
+
+F-test is very sensitive to departure from the normal assumption. You need to check whether the data is normally distributed before using the F-test.
+
+Shapiro-Wilk test can be used to test whether the normal assumption holds. It’s also possible to use Q-Q plot (quantile-quantile plot) to graphically evaluate the normality of a variable. Q-Q plot draws the correlation between a given sample and the normal distribution.
+
+```{r}
+qqnorm(df_rain$place_A, pch = 1, frame = FALSE)
+qqline(df_rain$place_A, col = "steelblue", lwd = 2)
+
+shapiro.test(df_rain$place_A) #since p-value is bigger than 5% it can be considered normal
+
+qqnorm(df_rain$place_B, pch = 1, frame = FALSE)
+qqline(df_rain$place_B, col = "steelblue", lwd = 2)
+
+shapiro.test(df_rain$place_B)#since p-value is bigger than 5% it can be considered normal
+```
+ Now that normality is checked, we can procceed to the F-test 
+
+```{r}
+# Calculating each variance
+var_A <- var(place_A)
+var_B <- var(place_B)
+
+F_stat <- var_A/var_B
+print(F_stat)
+
+var.test(place_A, place_B, alternative = "greater")
+
+```
+Because the p-value is less than 5% significance, the null hypothesis is rejected.
+
+Another way to test the hypothesis is by calculatinf the critical F-value
+
+```{r}
+# Critical F-value
+qf(p = 0.05, df1 = 13, df2 = 13, lower.tail=F)
+```
+
+Because the critical F-value is lower than the F-statistic, the null hypthesis is rejected
+
