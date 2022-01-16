@@ -1,0 +1,50 @@
+---
+title: "Question 11"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+
+## Question 11
+In the food industry, for the preparation of a certain product, the standard amount of  salt is 8g with a standard deviation equal to 1g. In the analysis of a sample of 85 products, an average amount of salt was observed of 8.25g. 
+
+Evaluate if the amount observed in the sample can be considered statistically major, at the level of significance of 5%.
+
+## Answer
+
+Z-test is used for it when sample size is large, generally n >30. Whereas t-test is used for hypothesis testing when sample size is small, usually n < 30 where n is used to quantify the sample size.
+
+```{r}
+salt_exp <- 8
+n <- 85
+salt_obs <- 8.25
+sd_obs <- 1
+
+Zscore <- (salt_obs - salt_exp) / sqrt(sd_obs/n)
+Zscore
+
+pval <-  1 - dnorm(Zscore, mean = 0, sd = sd_obs)
+pval
+
+crit_val <- qnorm(0.05,  lower.tail = F)
+crit_val
+```
+
+As the p-value is less than 5% or also the t-value is in the Critical Area [-2.3,+2,3], the mean is not statistically equal and the Yogurt has more calories than it says on average.
+
+```{r}
+library(ggplot2)
+
+z <- seq (-4,4, by=0.01) 
+fz <- dnorm(z, mean = 0, sd = 1)
+
+x <- seq(crit_val, 4, 0.1)
+y <- c(dnorm( x, mean = 0, sd = 1), 0,0)
+x <- c(x, 4, crit_val)
+
+ggplot() + geom_line(aes(z, fz)) +
+           geom_polygon(data = data.frame(x=x, y=y), aes(x, y), fill='blue')
+
+```
+```
+

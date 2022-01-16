@@ -1,0 +1,39 @@
+---
+title: "Question 12"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+
+## Question 12
+
+  In a sample of 425 measurements, it is observed that the average weight of the products that were measured is 226g, with a standard deviation of 10g. 
+  Establish the confidence interval for this average, knowing that the standard deviation observed is exactly its historical value. Consider a level of confidence of 95%
+## Answer
+
+The CI formula when the experimental design/sample sizes are small or when the standard deviation of the population is unknown:
+
+$$\mathrm{CI} = \bar{X} \pm (t_{n – 1} \times\frac{s}{\sqrt{n}})$$
+The tn−1 is taken from the t distribution based the degree of freedom and on the probability α that CI does not include the true population mean.
+
+When the experimental design/sample sizes are large or when the standard deviation of the population is known then CI formula is:
+
+$$\mathrm{CI} = \bar{X} \pm (z_{\frac{1 – α}{2}} \times\frac{s}{\sqrt{n}})$$
+
+
+```{r}
+
+n <- 425
+wg_obs <- 226
+sd_obs <- 10
+
+crit_val <- qnorm(1-0.05/2)
+crit_val
+
+delta <- crit_val * sd_obs / sqrt(n)
+
+CIinf <- wg_obs - delta
+Csup <- wg_obs + delta
+CIinf
+Csup
+```
