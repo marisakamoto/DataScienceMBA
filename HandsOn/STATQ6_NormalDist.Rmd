@@ -8,12 +8,111 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-6. In the last months, the time was measured between the beginning and end of one of 
+## Question 6. 
+In the last months, the time was measured between the beginning and end of one of 
 the stages of the production process of a certain product. The average time was 
 calculated in 26.5 minutes and the standard deviation was 4.0 minutes. Knowing that 
 this variable follows a normal distribution, identify the following information:
 
-a) P(X>37)
-b) P(X<20)
-c) P(22<X<28)
+  a) P(X>37)
+  b) P(X<20)
+  c) P(22<X<28)
+  
+## Answer
 
+** a) **
+We look at the steps necessary to calculate the p value for a particular test. In question a, we want to calculate the probability of an observation is higher than 37 min.
+```{r}
+# Sample information:
+aveTime <- 26.5
+sdTime <- 4
+
+# We want to calulate the Z-score associated to 37 min. The Z-score is found by assuming that the null hypothesis is true, subtracting the assumed mean, and dividing by the theoretical standard deviation.
+N <- 37
+Z <- (N - aveTime)/sdTime
+print(Z)
+
+#  If the Z-score that is found is positive then we need to take one minus the associated probability. Also, for a two sided test we need to multiply the result by two. Not the case here. 
+pValue <- (1 - pnorm(Z))
+pValue
+
+
+# The probability of the time average being more than 37 minutes is 0,43%
+```
+
+```{r}
+library(ggplot2)
+
+z <- seq(0,50,0.01)
+fz <- dnorm(z, mean = aveTime, sd = sdTime)
+q <- N
+x <- seq( q, 50, 0.01)
+y <- c(dnorm(x, mean = aveTime, sd = sdTime), 0, 0)
+x <- c(x, q ,q)
+ggplot() + geom_line(aes(z, fz)) +
+           geom_polygon(data = data.frame(x=x, y=y), aes(x, y), fill='blue')
+```
+
+
+** b) **
+```{r}
+# Now we want to calulate the Z-score associated to 20 min. The Z-score is found by assuming that the null hypothesis is true, subtracting the assumed mean, and dividing by the theoretical standard deviation.
+N <- 20
+Z <- (N - aveTime)/sdTime
+print(Z)
+#  As the Z-score that is found negative then we need to take one minus the associated probability.
+
+pValue <- (pnorm(Z))
+pValue
+
+# The probability of the time average being less than 20 minutes is 5.21%
+```
+
+```{r}
+library(ggplot2)
+
+z <- seq(0,50,0.01)
+fz <- dnorm(z, mean = aveTime, sd = sdTime)
+q <- N
+x <- seq(0, q, 0.01)
+y <- c(dnorm(x, mean = aveTime, sd = sdTime), 0, 0)
+x <- c(x, q,0)
+ggplot() + geom_line(aes(z, fz)) +
+           geom_polygon(data = data.frame(x=x, y=y), aes(x, y), fill='blue')
+```
+
+** c) **
+```{r}
+# Now we want to calulate the Z-score associated to 22 and 28 min. The Z-score is found by assuming that the null hypothesis is true, subtracting the assumed mean, and dividing by the theoretical standard deviation.
+N1 <- 22
+N2 <-28
+
+Z1 <- (N1 - aveTime)/sdTime
+Z2 <- (N2 - aveTime)/sdTime
+
+print(Z1)
+print(Z2)
+#  As the Z-score that is found negative then we need to take one minus the associated probability.
+
+pValue1 <- (pnorm(Z1))
+
+pValue2 <- pnorm(Z2)
+pValue2
+
+pValue <-  pValue2 - pValue1
+pValue
+
+```
+
+```{r}
+library(ggplot2)
+
+z <- seq(0,50,0.01)
+fz <- dnorm(z, mean = aveTime, sd = sdTime)
+x <- seq(N1, N2, 0.01)
+y <- c(dnorm(x, mean = aveTime, sd = sdTime), 0, 0)
+x <- c(x, N2,N1)
+
+ggplot() + geom_line(aes(z, fz)) +
+           geom_polygon(data = data.frame(x=x, y=y), aes(x, y), fill='blue')
+```
