@@ -1,0 +1,83 @@
+---
+title: "Question 9"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+
+## Question 9
+Source: Fávero and Belfiore, 2017, Cap. 7) 
+It is desired to compare the average time for service (min) in 2 hospitals.
+To do this, a sample was collected with 20 patients in each hospital.
+
+Check if there are differences between the average times of waiting in two hospitals. 
+
+Consider α = 1%.
+
+Additionally, calculate the confidence intervals for the average time for waiting in the two hospitals
+
+
+```{r}
+hosp1 <- c(72,	58,	91,	88,	70,	76,	98,	101,	65,	73,	79,	82,	80,	91,	93,	88,	97,	83,	71,	74)
+hosp2 <- c(66,	40,	55,	70,	76,	61,	53,	50,	47,	61,	52,	48,	60,	72,	57,	70,	66,	55,	46,	51)
+
+# mean time from hospital 1
+mean(hosp1)
+# mean time from hospital 2
+mean(hosp2)
+# var time from hospital 1
+var(hosp1)
+# var time from hospital 2
+var(hosp2)
+```
+
+Test the normality of the samples:
+```{r}
+
+qqnorm(hosp1, pch = 1, frame = FALSE)
+qqline(hosp1, col = "steelblue", lwd = 2)
+
+shapiro.test(hosp1) #since p-value is bigger than 5% it can be considered normal
+
+qqnorm(hosp2, pch = 1, frame = FALSE)
+qqline(hosp2, col = "steelblue", lwd = 2)
+
+shapiro.test(hosp2)#since p-value is bigger than 5% it can be considered normal
+
+
+```
+
+1. Test of the Variances
+Variance test to check if they are statistically equal or hosp 1 is greater then hosp 2
+```{r}
+var.test(hosp1, hosp2, alternative = "greater")
+```
+Because the p-values is greater than 5%, the null hipothesis is not rejected
+
+2. Test of Averages
+
+**The unpaired two-samples t-test is used to compare the mean of two independent groups.**
+
+Note that, unpaired two-samples t-test can be used only under certain conditions:
+
+when the two groups of samples (A and B), being compared, are normally distributed. This can be checked using Shapiro-Wilk test.
+and when the variances of the two groups are equal. This can be checked using F-test.
+
+```{r}
+t.test(hosp1,hosp2, conf.level = 0.99)
+```
+As the p-values is less than 1%, we reject the null hypothesis and we can say that their average are statistically different.
+
+
+To get the interval of confidence of 1%
+
+```{r}
+ttest1 <- t.test(hosp1, conf.level = 0.99)
+ttest2 <- t.test(hosp2, conf.level = 0.99)
+
+ttest1$conf.int
+ttest2$conf.int
+```
+Source: 
+http://www.sthda.com/english/wiki/unpaired-two-samples-t-test-in-r
+
