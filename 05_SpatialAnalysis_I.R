@@ -152,8 +152,11 @@ plotly::ggplotly(
 help(package = "tm_shape")
 # Utilizando a tmap: ------------------------------------------------------
 library(tmap)
+
+
 tm_shape(shp = shp_dados_sp) +
   tm_fill(col = "idh", palette = "Blues")
+
 
 
 # Como saber quais paletas de cores podem ser utilizadas? -----------------
@@ -189,7 +192,7 @@ tm_shape(shp = shp_dados_sp) +
   tm_fill(col = "idh", 
           style = "quantile", 
           n = 4, 
-          palette = "BuPu", 
+          palette = "RdPu", 
           legend.hist = TRUE) +
   tm_layout(legend.text.size = 0.7,
             legend.title.size = 0.9,
@@ -197,7 +200,7 @@ tm_shape(shp = shp_dados_sp) +
             legend.hist.height = 0.2,
             legend.hist.width = 0.3,
             frame = FALSE,
-            main.title = "A Distribuição do IDH nos Municípios de SP")
+            main.title = "HDI Distribution by City in São Paulo State")
 
 # Adicionando uma bússola e bordas aos polígonos
 tm_shape(shp = shp_dados_sp) + 

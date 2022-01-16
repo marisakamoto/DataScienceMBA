@@ -20,7 +20,7 @@ if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
 
 # Carregando um shapefile -------------------------------------------------
 shp_sp <- readOGR(dsn = "shapefile_sp", layer = "estado_sp")
-
+help(readOGR)
 # Características básicas do objeto shp_sp
 summary(shp_sp)
 

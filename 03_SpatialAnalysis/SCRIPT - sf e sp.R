@@ -74,7 +74,7 @@ tm_shape(shp = shp_saopaulo) +
   tm_borders(alpha = 0.5) +
   tm_shape(shp = sf_shoppings) + 
   tm_dots(col = "regiao", 
-          size = 0.02)
+          size = 0.05)
 
 
 # 3. BUFFER ANALYSIS
