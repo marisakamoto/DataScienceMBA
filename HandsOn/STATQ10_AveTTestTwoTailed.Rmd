@@ -1,0 +1,75 @@
+---
+title: "Question 10"
+author: "Mariana Higashi Sakamoto"
+date: "16/01/2022"
+output: html_document
+---
+
+## Question 10
+
+(Source: Fávero and Belfiore, 2017, Cap. 7)
+
+  A manufacturer of skimmed yogurts states that the amount of calories in each cup is **60 cal**.
+  To verify if this information is correct, a random sample with **36 cups** is collected, observing that the average amount of calories is **65 cal** with a **standard deviation of 3.5**. 
+
+  Apply the appropriate test and verify if the statement of the manufacturer is true, considering the level of significance of 5%.
+
+## Answer
+
+one-sample t-test is used to compare the mean of one sample to a known standard (or theoretical/hypothetical) mean (μ).
+
+Generally, the theoretical mean comes from:
+
+a previous experiment. For example, compare whether the mean weight of mice differs from 200 mg, a value determined in a previous study.
+or from an experiment where you have control and treatment conditions. If you express your data as “percent of control”, you can test whether the average value of treatment condition differs significantly from 100.
+Note that, one-sample t-test can be used only, when the data are normally distributed . This can be checked using Shapiro-Wilk test .
+
+The t-statistic can be calculated as follow:
+
+$$ t= \dfrac{m-\mu}{{s}/{\sqrt{n}}} $$
+
+where,
+  $m$ is the sample mean
+  $n$ is the sample size
+  $s$is the sample standard deviation with n−1 degrees of freedom
+  $\mu$ is the theoretical value
+We can compute the p-value corresponding to the absolute value of the t-test statistics (|t|) for the degrees of freedom (df): df=n−1.
+
+```{r}
+
+cal_exp <- 60
+
+cups <- 36
+cal_obs <- 65
+sd_obs <- 3.5
+
+ttest <- (cal_obs - cal_exp) / (sd_obs / sqrt(cups))
+
+ttest
+
+#because it is positive and is a two-tailed test:
+pval <- 2*(1 - pt(ttest, df = 35))
+pval
+#because is a two-tailed test
+crit_val <-qt(1-0.05/2, df =35)
+crit_val
+```
+
+As the p-value is less than 5% or also the t-value is in the Critical Area [-2.3,+2,3], the mean is not statistically equal and the Yogurt has more calories than it says on average.
+
+```{r}
+library(ggplot2)
+
+z <- seq (-10,10, by=0.1) 
+fz <- dt(x = z, df = 35)
+
+x <- seq(-crit_val, crit_val, 0.1)
+y <- c(dt(x = x, df = 35), 0,0)
+x <- c(x, crit_val, -crit_val)
+
+ggplot() + geom_line(aes(z, fz)) +
+           geom_polygon(data = data.frame(x=x, y=y), aes(x, y), fill='blue')
+
+```
+```
+
