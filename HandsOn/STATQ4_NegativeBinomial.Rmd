@@ -27,9 +27,9 @@ Where $(^{x-1}_{k-1}) = \dfrac{(x-1)!}{(k-1)![(x-1)-(k-1)]!}$
 
 ### Answer
 ```{r}
-r = 12
-p = 3/5
-n = 20 - r
+r <- 12
+p <- 3/5
+n <- 20 - r
 
 # exact
 P1<- dnbinom(x = n, size = r, prob = p)

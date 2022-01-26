@@ -3,7 +3,7 @@
 
 pacotes <- c("rgdal","raster","tmap","maptools","sf","rgeos","sp","adehabitatHR",
              "tidyverse","broom","rayshader","knitr","kableExtra","RColorBrewer",
-             "profvis","measurements", "plotly")
+             "profvis","measurements", "plotly", "rgdal","gridExtra", "png", "grid", "rgl", "devtools")
 
 if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
   instalador <- pacotes[!pacotes %in% installed.packages()]
@@ -14,4 +14,7 @@ if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
 } else {
   sapply(pacotes, require, character = T) 
 }
+
+devtools::install_github("tylermorganwall/rayshader")
+library(rayshader)
 
