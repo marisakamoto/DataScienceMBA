@@ -19,6 +19,7 @@ if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
 # Carregando a base de dados
 load("shoppings.RData")
 
+
 # Observando a classe do objeto shoppings:
 class(shoppings)
 
@@ -140,6 +141,8 @@ buffer_shoppings <- gBuffer(spgeom = sp_shoppings,
 # Dessa vez, o erro foi diferente. Além de exigir um objeto de classe sp,
 # a função gBuffer() exige que o objeto se oriente com distâncias euclidianas.
 # Nosso atual objeto se orienta de forma geodésica.
+
+
 shoppings_UTM <- spTransform(x = sp_shoppings,
                              CRSobj = CRS("+init=epsg:22523"))
 
@@ -151,6 +154,7 @@ tm_shape(shp = shoppings_UTM) +
 buffer_shoppings <- gBuffer(spgeom = shoppings_UTM, 
                             width = 1500, 
                             byid = TRUE)
+
 
 # Plotagem do objeto buffer_shoppings:
 tm_shape(shp = buffer_shoppings) + 
@@ -223,17 +227,21 @@ tm_shape(shp = shp_saopaulo) +
   tm_shape(shp = shoppings_sp_df) + 
   tm_dots(col = "regiao", size = 0.25) + 
   tm_shape(zona1) + 
-  tm_borders(col = "firebrick4", lwd = 2.5) +
-  tm_fill(alpha = 0.4, col = "firebrick4") + 
+  tm_borders(col = "skyblue4", lwd = 2.5) +
+  tm_fill(alpha = 0.4, col = "skyblue4") + 
   tm_shape(zona2) + 
-  tm_borders(col = "firebrick3", lwd = 2.5) + 
-  tm_fill(alpha = 0.3, col = "firebrick3") + 
+  tm_borders(col = "skyblue3", lwd = 2.5) + 
+  tm_fill(alpha = 0.3, col = "skyblue3") + 
   tm_shape(zona3) + 
-  tm_borders(col = "firebrick2", lwd = 2.5) + 
-  tm_fill(alpha = 0.2, col = "firebrick2") +
+  tm_borders(col = "skyblue2", lwd = 2.5) + 
+  tm_fill(alpha = 0.2, col = "skyblue2") +
   tm_shape(zona4) + 
-  tm_borders(col = "firebrick1", lwd = 2.5) + 
-  tm_fill(alpha = 0.1, col = "firebrick1")
+  tm_borders(col = "skyblue1", lwd = 2.5) + 
+  tm_fill(alpha = 0.1, col = "skyblue1")
 
 
-# FIM ---------------------------------------------------------------------
+tmaptools::palette_explorer()
+
+# FIM -----------#c----------------------------------------------------------
+#Clean RAM space
+gc()
