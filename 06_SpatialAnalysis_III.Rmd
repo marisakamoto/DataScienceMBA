@@ -1,0 +1,160 @@
+---
+title: "Spatial Analysis III"
+output: html_notebook
+---
+### Setting up the libraries
+```{r}
+pacotes <- c("rgdal","plotly","tidyverse","knitr","kableExtra","gridExtra",
+             "png","grid","magick","rgl","devtools","GISTools","rayshader",
+             "tmap","broom")
+
+if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
+  instalador <- pacotes[!pacotes %in% installed.packages()]
+  for(i in 1:length(instalador)) {
+    install.packages(instalador, dependencies = T)
+    break()}
+  sapply(pacotes, require, character = T) 
+} else {
+  sapply(pacotes, require, character = T) 
+}
+```
+
+### 1. Loading the shapefile from Santa Catarina State, Brazil and the poverty data
+
+```{r }
+shp_sc <- readOGR(dsn = "shapefile_sc",
+                  layer = "sc_state")
+
+load("dados_sc.RData")
+
+dados_sc %>% 
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = TRUE, 
+                font_size = 12) # Contain city name and poverty index
+
+summary(dados_sc)
+```
+### 2. Creating a dataframe from the shapefile and merging 
+```{r}
+
+shp_sc_df <- tidy(shp_sc, region = "CD_GEOCMU") %>% 
+  rename(CD_GEOCMU = id)
+
+shp_sc_df <- shp_sc_df %>% 
+  left_join(dados_sc, by = "CD_GEOCMU")
+
+```
+### 3. Plotting the poverty map in Santa Catarina
+
+```{r }
+mapa_sc <- shp_sc_df %>%
+  ggplot(aes(x = long,
+           y = lat, 
+           group = group, 
+           fill = poverty)) +
+  geom_polygon() +
+  scale_fill_gradient(limits = range(shp_sc_df$poverty),
+                      low = "#FFF3B0", 
+                      high="#E09F3E") +
+  layer(geom = "path", 
+        stat = "identity", 
+        position = "identity",
+        mapping = aes(x = long, 
+                      y = lat, 
+                      group = group, 
+                      color = I('#FFFFFF'))) +
+  theme(legend.position = "none", 
+        axis.line = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.title.x = element_blank(),
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(), 
+        panel.background = element_blank())
+
+mapa_sc %>% plot()
+```
+### 4. Saving map as png
+
+```{r}
+# Minimun and maximun of lattitude and longitude
+xlim <- ggplot_build(mapa_sc)$layout$panel_scales_x[[1]]$range$range
+ylim <- ggplot_build(mapa_sc)$layout$panel_scales_y[[1]]$range$range
+
+ggsave(filename = "mapa_co_dsa.png",
+       width = diff(xlim) * 4, 
+       height = diff(ylim) * 4, 
+       units = "cm")
+```
+
+
+### 5. Reading the image again. 
+Note that our intention is to plot the same map with the poverty rate as the z-index 
+```{r}
+#readig the png
+background_mapa <- readPNG("mapa_co_dsa.png")
+
+# Capturing the coorditates and centroid (variable CD_GEOCMU) into a dataframe
+coordinates(shp_sc) %>% 
+  data.frame() %>% 
+  rename(longitude = 1,
+         latitude = 2) %>% 
+  mutate(CD_GEOCMU = shp_sc@data$CD_GEOCMU) %>% 
+  dplyr::select(latitude, everything()) -> coords_sc
+```
+
+### 6. Merging the dataframe containing the centroids to the dataframe containg the gemetry of city limits in Santa Catarina
+```{r}
+
+shp_sc_df <- shp_sc_df %>% 
+  left_join(coords_sc, by = "CD_GEOCMU")
+
+head(shp_sc_df)
+```
+### 7. Georeferring the PNG image and plotting the poverty index in each city centroid. 
+Note we are plotting the dataframe and the image together by 
+```{r warning=FALSE}
+mapa_pobreza <- shp_sc_df %>%
+  ggplot() + 
+  annotation_custom(
+    rasterGrob(background_mapa, 
+               width=unit(1,"npc"),
+               height=unit(1,"npc")),-Inf, Inf, -Inf, Inf) + 
+  xlim(xlim[1],xlim[2]) + # x-axis Mapping
+  ylim(ylim[1],ylim[2]) + # y-axis Mapping
+  geom_point(aes(x = longitude, y = latitude, color = poverty), size = 1.5) + 
+  scale_colour_gradient(name = "Poverty", 
+                        limits = range(shp_sc_df$poverty), 
+                        low = "#FCB9B2", 
+                        high = "#B23A48") + 
+  theme(axis.line = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.title.x = element_blank(),
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(), 
+        panel.background = element_blank())
+
+mapa_pobreza %>% plot()
+```
+### 8. Generating a 3D map
+```{r warning=FALSE}
+
+plot_gg(ggobj = mapa_pobreza, 
+        width = 11, 
+        height = 6, 
+        scale = 300, 
+        multicore = TRUE, 
+        windowsize = c(500, 400))
+
+
+render_camera(fov = 70, 
+              zoom = 0.5, 
+              theta = 130, 
+              phi = 35)
+
+```
+
+
+
