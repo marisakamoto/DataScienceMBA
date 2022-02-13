@@ -3,7 +3,7 @@ title: "Spatial Analysis III"
 output: html_notebook
 ---
 ### Setting up the libraries
-```{r}
+```{r warning=FALSE}
 pacotes <- c("rgdal","plotly","tidyverse","knitr","kableExtra","gridExtra",
              "png","grid","magick","rgl","devtools","GISTools","rayshader",
              "tmap","broom")
@@ -22,10 +22,10 @@ if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
 ### 1. Loading the shapefile from Santa Catarina State, Brazil and the poverty data
 
 ```{r }
-shp_sc <- readOGR(dsn = "shapefile_sc",
+shp_sc <- readOGR(dsn = "E:/DataScienceMBA/RStudio/03_SpatialAnalysis/shapefile_sc",
                   layer = "sc_state")
 
-load("dados_sc.RData")
+load("E:/DataScienceMBA/RStudio/03_SpatialAnalysis/dados_sc.RData")
 
 dados_sc %>% 
   kable() %>%
@@ -139,20 +139,18 @@ mapa_pobreza <- shp_sc_df %>%
 mapa_pobreza %>% plot()
 ```
 ### 8. Generating a 3D map
-```{r warning=FALSE}
+```{r }
+options(rgl.useNULL = TRUE) # Suppress the separate window.
+library(rgl)
 
 plot_gg(ggobj = mapa_pobreza, 
         width = 11, 
         height = 6, 
         scale = 300, 
-        multicore = TRUE, 
-        windowsize = c(500, 400))
+        multicore = TRUE
+        )
 
-
-render_camera(fov = 70, 
-              zoom = 0.5, 
-              theta = 130, 
-              phi = 35)
+rglwidget()
 
 ```
 
