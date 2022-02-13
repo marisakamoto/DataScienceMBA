@@ -215,6 +215,8 @@ shp_sp@data %>%
                 full_width = TRUE, 
                 font_size = 12)
 
+head(shp_sp@data)
+
 # Para que possamos traçar as distâncias sociais, assumindo como métrica de 
 # distância social o PIB per capita das cidades de SP, devemos estipular uma
 # distância de corte di(k). Para o caso, propomos como cut-off a variação de 
@@ -222,7 +224,7 @@ shp_sp@data %>%
 
 # Desta forma, apenas para facilitar o cálculo, vamos padronizar a variável pib 
 # pelo procedimento zscores:
-shp_sp@data["Zpib"] <- scale(shp_sp@data$pib)
+shp_sp@data["Zpib"] <- scale(shp_sp@data$pib.x)
 
 summary(shp_sp@data)
 mean(shp_sp@data$Zpib)
