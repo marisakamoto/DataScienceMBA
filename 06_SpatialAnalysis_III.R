@@ -226,7 +226,7 @@ head(shp_sp@data)
 # pelo procedimento zscores:
 shp_sp@data["Zpib"] <- scale(shp_sp@data$pib.x)
 
-summary(shp_sp@data)
+summary(shp_sp@data$NM_MUNICIP)
 mean(shp_sp@data$Zpib)
 
 # A matriz de distâncias sociais pode ser obtida da seguinte maneira:
@@ -309,7 +309,6 @@ tm_shape(shp = shp_sp) +
   tm_fill(col = "idh", style = "quantile", n = 5, palette = "-magma") +
   tm_borders()
 
-
 # 01) Autocorrelação Global – a Estatística I de Moran --------------------
 
 # Para o cálculo da Estatística I de Moran, nosso algoritmo esperará como
@@ -318,8 +317,9 @@ tm_shape(shp = shp_sp) +
 listw_queen <- mat2listw(matrizW_queen)
 class(listw_queen)
 
+summary(shp_sp@data)
 # Após isso, poderemos utilizar a função
-moran.test(x = shp_sp@data$pib, 
+moran.test(x = shp_sp@data$idh, 
            listw = listw_queen, 
            zero.policy = TRUE)
 
@@ -332,7 +332,36 @@ moran.plot(x = shp_sp@data$idh,
            ylab = "IDH Espacialmente Defasado",
            pch = 19)
 
+# Manually do the Diagram plot:
 
+widh <- lag.listw( x= listw_queen,
+                   var = shp_sp@data$idh,
+                   zero.policy = TRUE)
+widh
+
+
+df <- data.frame(cidade = shp_sp@data$NM_MUNICIP, 
+                 idh = shp_sp@data$idh,
+                 widh)
+
+# Other way to do widh
+df["widh2"] <- matrizW_queen %*% shp_sp@data$idh
+df
+
+
+plotly::ggplotly(
+  df %>% 
+    ggplot(aes(label = cidade)) +
+    geom_point(aes(x=idh, y = widh), alpha= 0.5, size = 1) +
+    geom_smooth(aes(x = idh, y = widh), method = 'lm', se = F) +
+    geom_hline(yintercept = mean(df$widh), lty=2) +
+    geom_vline(xintercept = mean(df$idh), lty=2) +
+    theme_bw()
+  
+)
+  
+  
+  
 # 03) Autocorrelação Local – a Estatística Moran Local --------------------
 
 # Seguindo o proposto por Anselin (1995), devemos padronizar em linha nossa 
@@ -346,6 +375,11 @@ matrizW_queen_linha <- nb2mat(neighbour_queen,
 moran_local <- localmoran(x = shp_sp@data$idh, 
                           listw = listw_queen, 
                           zero.policy = TRUE)
+View(moran_local)
+
+# Manually 
+arrayZidh <-shp_sp@data$idh
+rowSums(sweep(x = matrizW_queen_linha, MARGIN = 2, STATS = arrayZidh, FUN = "*")) *arrayZidh
 
 # Juntando os resultados da Estatística Moran Local no dataset do objeto shp_sp:
 moran_local_mapa <- cbind(shp_sp, moran_local)
